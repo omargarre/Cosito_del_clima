@@ -523,6 +523,33 @@ body { display:flex; }
 
 .next-block .status-relative { color:var(--yellow); }
 
+.current-strip {
+  display:none;
+  padding:9px 12px;
+  border:1px solid rgba(94,231,239,.32);
+  border-left:4px solid var(--cyan);
+  border-radius:7px;
+  background:rgba(94,231,239,.08);
+}
+
+.current-strip.visible { display:block; }
+
+.current-strip-label {
+  color:var(--cyan);
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.07em;
+}
+
+.current-strip-content {
+  margin-top:3px;
+  font-size:16px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 .next-content {
   min-width:0;
   display:flex;
@@ -758,7 +785,7 @@ body { display:flex; }
 
   #screenMain.active {
     display:grid;
-    grid-template-columns:minmax(250px,29%) minmax(0,56%) minmax(118px,15%);
+    grid-template-columns:minmax(250px,29%) minmax(0,53%) minmax(150px,18%);
     grid-template-rows:minmax(0,1fr) 32px;
   }
 
@@ -797,16 +824,16 @@ body { display:flex; }
   .seahorse-art { width:auto; height:min(60vh,300px); max-width:112%; max-height:94%; }
   .weather-data { gap:6px; }
   .weather-title { font-size:23px; }
-  .condition-box { grid-template-columns:minmax(0,1fr) 120px; }
+  .condition-box { grid-template-columns:minmax(0,1fr) 150px; }
   .condition, .temp { gap:5px; padding:7px; font-size:20px; }
   .temp { font-size:32px; }
   .details { gap:5px; }
   .detail-value { margin-top:3px; font-size:16px; }
 
   .side { display:grid; grid-template-rows:1fr; gap:0; }
-  .side .time { font-size:43px; }
-  .side .date { margin-top:8px; font-size:13px; }
-  .temp { font-size:42px; }
+  .side .time { font-size:52px; line-height:1; }
+  .side .date { margin-top:10px; font-size:15px; }
+  .temp { font-size:52px; }
 
   .footer,
   #screenAgenda .footer {
@@ -825,7 +852,7 @@ body { display:flex; }
 
   .next-panel { gap:6px; }
   .next-label { padding:6px 9px; font-size:12px; }
-  .next-block { flex:1; padding:16px; border-radius:6px; }
+  .next-block { flex:1; padding:14px; border-radius:6px; }
   .status-label { font-size:15px; }
   .status-title { margin-top:8px; font-size:28px; line-height:1.06; }
   .status-time { margin-top:12px; font-size:20px; }
@@ -833,7 +860,7 @@ body { display:flex; }
 
   .list-title { padding:9px 14px; font-size:18px; }
   .event-list-scroll { padding:3px 8px 8px; }
-  .event-day-heading { padding:8px 4px 5px; font-size:13px; }
+  .event-day-heading { padding:9px 4px 6px; font-size:17px; }
   .event-row {
     grid-template-columns:76px minmax(0,1fr);
     gap:7px;
@@ -841,8 +868,11 @@ body { display:flex; }
     padding:7px 10px;
     border-left-width:4px;
   }
-  .event-name { font-size:17px; }
-  .event-hour { font-size:18px; }
+  .event-name { font-size:21px; }
+  .event-hour { font-size:21px; }
+  .current-strip { padding:7px 10px; }
+  .current-strip-label { font-size:11px; }
+  .current-strip-content { font-size:14px; }
   .empty-state { padding:18px; font-size:18px; }
 }
 </style>
@@ -944,6 +974,10 @@ body { display:flex; }
       <div id="nextTime" class="status-time">--</div>
       <div id="nextRelative" class="status-relative"></div>
     </div>
+    <div id="currentStrip" class="current-strip">
+      <div class="current-strip-label">EN CURSO</div>
+      <div id="currentStripContent" class="current-strip-content"></div>
+    </div>
   </article>
 
   <article class="panel list-panel">
@@ -1003,7 +1037,7 @@ function updateScrollingText() {
       const distance = Math.max(0, span.scrollWidth - el.clientWidth);
       if (distance <= 2) return;
       el.style.setProperty("--scroll-distance", distance + "px");
-      el.style.setProperty("--scroll-duration", Math.max(10, distance / 22) + "s");
+      el.style.setProperty("--scroll-duration", Math.max(16, distance / 10) + "s");
       el.classList.add("is-overflowing");
     });
   });
@@ -1033,10 +1067,10 @@ function updateVerticalScrolling(attempt = 0) {
 
     const distance = Math.max(0, content.scrollHeight - frame.clientHeight);
     if (distance <= 2) return;
-    const duration = Math.max(2500, (distance / 120) * 1000);
+    const duration = Math.max(9000, (distance / 35) * 1000);
 
     content.style.setProperty("--scroll-y-distance", distance + "px");
-    // Velocidad del scroll vertical: menos segundos o divisor mas grande = mas rapido.
+    // Desplazamiento deliberadamente lento para lectura a distancia.
     content.style.setProperty("--scroll-y-duration", duration + "ms");
     void content.offsetHeight;
 
@@ -1257,7 +1291,18 @@ function renderEvents(events) {
   const valid = events
     .filter(e => e && e.start && !isNaN(new Date(e.start)))
     .sort((a,b) => new Date(a.start) - new Date(b.start))
+  const current = valid.find(e => e.end && new Date(e.start) <= now && new Date(e.end) > now);
   const upcoming = valid.filter(e => new Date(e.start) >= now).slice(0, 8);
+
+  const currentStrip = document.getElementById("currentStrip");
+  if (current) {
+    currentStrip.classList.add("visible");
+    document.getElementById("currentStripContent").textContent =
+      clean(current.title || "Evento") + " · hasta " + eventHour(current.end);
+  } else {
+    currentStrip.classList.remove("visible");
+    document.getElementById("currentStripContent").textContent = "";
+  }
 
   if (!upcoming.length) {
     document.getElementById("nextTitle").textContent = "SIN EVENTOS";
