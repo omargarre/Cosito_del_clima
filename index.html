@@ -738,6 +738,111 @@ body { display:flex; }
     text-align:left;
   }
 }
+
+/* Modo kiosco para la pantalla horizontal de 10" (1024 × 576). */
+@media (min-width:900px) and (max-width:1100px) and (max-height:650px) {
+  html, body { overflow:hidden; }
+
+  .screen {
+    width:100vw;
+    height:100vh;
+    min-height:0;
+    padding:8px;
+    gap:8px;
+  }
+
+  #screenMain.active {
+    display:grid;
+    grid-template-columns:minmax(250px,29%) minmax(0,56%) minmax(118px,15%);
+    grid-template-rows:minmax(0,1fr) 32px;
+  }
+
+  #screenAgenda.active {
+    display:grid;
+    grid-template-columns:minmax(330px,38%) minmax(0,1fr);
+    grid-template-rows:58px minmax(0,1fr) 30px;
+  }
+
+  .panel,
+  #screenAgenda .panel {
+    min-height:0;
+    margin:0;
+    padding:10px;
+    border-radius:6px;
+  }
+
+  .title { gap:7px; font-size:18px; }
+  .title-mark { width:30px; height:30px; }
+
+  .tank-panel { gap:6px; }
+  .tank-area { min-height:0; }
+  .tank { width:min(88%,285px); border-width:3px; border-radius:6px 6px 18px 18px; }
+  .tank::before { top:-24px; height:37px; border-width:3px; }
+  .tank::after { inset:7px; }
+  .tank-percent { font-size:40px; }
+  .tank-stats { gap:5px; }
+  .stat, .detail { padding:6px; }
+  .stat-label, .detail-label { font-size:10px; }
+  .stat-value { margin-top:2px; font-size:17px; }
+  .update, .weather-update { padding:5px 7px; font-size:11px; }
+  .update { margin-top:5px; }
+
+  .weather-panel { grid-template-columns:minmax(170px,34%) minmax(0,1fr); gap:8px; }
+  .seahorse-box { min-height:0; }
+  .seahorse-art { width:auto; height:min(60vh,300px); max-width:112%; max-height:94%; }
+  .weather-data { gap:6px; }
+  .weather-title { font-size:23px; }
+  .condition-box { grid-template-columns:minmax(0,1fr) 120px; }
+  .condition, .temp { gap:5px; padding:7px; font-size:20px; }
+  .temp { font-size:32px; }
+  .details { gap:5px; }
+  .detail-value { margin-top:3px; font-size:16px; }
+
+  .side { display:grid; gap:8px; }
+  .time { font-size:32px; }
+  .date { font-size:11px; }
+  .ring { width:82px; border-width:6px; outline-width:2px; outline-offset:-11px; font-size:10px; }
+  .ring b { font-size:27px; }
+
+  .footer,
+  #screenAgenda .footer {
+    margin:0;
+    padding:0;
+    gap:18px;
+    flex-wrap:nowrap;
+    font-size:11px;
+  }
+
+  .agenda-header { margin:0; align-items:center; }
+  .agenda-header-title { font-size:28px; }
+  .agenda-header .timebox { display:grid; grid-template-columns:auto; }
+  .agenda-header .time { font-size:30px; line-height:1; }
+  .agenda-header .date { font-size:11px; line-height:1.2; }
+
+  .next-panel { gap:6px; }
+  .next-label { padding:6px 9px; font-size:12px; }
+  .now-block, .next-block { padding:8px 11px; border-radius:6px; }
+  .now-block { flex-basis:44%; }
+  .next-block { flex-basis:56%; }
+  .status-label { font-size:12px; }
+  .status-title { margin-top:3px; font-size:21px; line-height:1.02; }
+  .status-time { margin-top:5px; font-size:15px; }
+  .status-relative { margin-top:3px; font-size:13px; }
+
+  .list-title { padding:9px 14px; font-size:18px; }
+  .event-list-scroll { padding:3px 8px 8px; }
+  .event-day-heading { padding:8px 4px 5px; font-size:13px; }
+  .event-row {
+    grid-template-columns:76px minmax(0,1fr);
+    gap:7px;
+    margin-bottom:4px;
+    padding:7px 10px;
+    border-left-width:4px;
+  }
+  .event-name { font-size:17px; }
+  .event-hour { font-size:18px; }
+  .empty-state { padding:18px; font-size:18px; }
+}
 </style>
 </head>
 
