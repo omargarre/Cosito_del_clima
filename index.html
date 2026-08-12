@@ -354,11 +354,16 @@ body { display:flex; }
 
 .side {
   display:grid;
-  grid-template-rows:auto minmax(0,1fr);
+  grid-template-rows:1fr;
   gap:16px;
 }
 
-.timebox { text-align:center; }
+.timebox {
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
 
 .time {
   font-size:clamp(44px,4vw,62px);
@@ -798,11 +803,10 @@ body { display:flex; }
   .details { gap:5px; }
   .detail-value { margin-top:3px; font-size:16px; }
 
-  .side { display:grid; gap:8px; }
-  .time { font-size:32px; }
-  .date { font-size:11px; }
-  .ring { width:82px; border-width:6px; outline-width:2px; outline-offset:-11px; font-size:10px; }
-  .ring b { font-size:27px; }
+  .side { display:grid; grid-template-rows:1fr; gap:0; }
+  .side .time { font-size:43px; }
+  .side .date { margin-top:8px; font-size:13px; }
+  .temp { font-size:42px; }
 
   .footer,
   #screenAgenda .footer {
@@ -821,13 +825,11 @@ body { display:flex; }
 
   .next-panel { gap:6px; }
   .next-label { padding:6px 9px; font-size:12px; }
-  .now-block, .next-block { padding:8px 11px; border-radius:6px; }
-  .now-block { flex-basis:44%; }
-  .next-block { flex-basis:56%; }
-  .status-label { font-size:12px; }
-  .status-title { margin-top:3px; font-size:21px; line-height:1.02; }
-  .status-time { margin-top:5px; font-size:15px; }
-  .status-relative { margin-top:3px; font-size:13px; }
+  .next-block { flex:1; padding:16px; border-radius:6px; }
+  .status-label { font-size:15px; }
+  .status-title { margin-top:8px; font-size:28px; line-height:1.06; }
+  .status-time { margin-top:12px; font-size:20px; }
+  .status-relative { margin-top:8px; font-size:18px; }
 
   .list-title { padding:9px 14px; font-size:18px; }
   .event-list-scroll { padding:3px 8px 8px; }
@@ -915,9 +917,6 @@ body { display:flex; }
       <div id="clock1" class="time">--:--</div>
       <div id="date1" class="date">--</div>
     </div>
-    <div class="countdown">
-      <div class="ring">CAMBIA EN <b id="count1">15</b> SEG.</div>
-    </div>
   </aside>
 
   <footer class="footer">
@@ -938,13 +937,7 @@ body { display:flex; }
   </header>
 
   <article class="panel next-panel">
-    <div class="next-label">LO IMPORTANTE AHORA</div>
-    <div id="nowBlock" class="now-block">
-      <div id="nowLabel" class="status-label">AHORA</div>
-      <div id="nowTitle" class="status-title">SIN EVENTO EN CURSO</div>
-      <div id="nowTime" class="status-time">--</div>
-      <div id="nowRelative" class="status-relative"></div>
-    </div>
+    <div class="next-label">PRÓXIMO EVENTO</div>
     <div class="next-block">
       <div class="status-label upcoming">SIGUIENTE</div>
       <div id="nextTitle" class="status-title">--</div>
@@ -960,7 +953,6 @@ body { display:flex; }
 
   <footer class="footer">
     <span>🔄 Cambia cada <b>15 segundos</b></span>
-    <span>⏱️ Faltan <b id="count2">15</b> segundos</span>
   </footer>
 </section>
 
@@ -1265,21 +1257,7 @@ function renderEvents(events) {
   const valid = events
     .filter(e => e && e.start && !isNaN(new Date(e.start)))
     .sort((a,b) => new Date(a.start) - new Date(b.start))
-  const current = valid.find(e => e.end && new Date(e.start) <= now && new Date(e.end) > now);
   const upcoming = valid.filter(e => new Date(e.start) >= now).slice(0, 8);
-
-  const nowBlock = document.getElementById("nowBlock");
-  if (current) {
-    nowBlock.classList.remove("is-empty");
-    document.getElementById("nowTitle").textContent = clean(current.title || "Evento");
-    document.getElementById("nowTime").textContent = eventHour(current.start) + " – " + eventHour(current.end);
-    document.getElementById("nowRelative").textContent = relativeUntil(current.end, "TERMINA EN");
-  } else {
-    nowBlock.classList.add("is-empty");
-    document.getElementById("nowTitle").textContent = "SIN EVENTO EN CURSO";
-    document.getElementById("nowTime").textContent = "";
-    document.getElementById("nowRelative").textContent = "";
-  }
 
   if (!upcoming.length) {
     document.getElementById("nextTitle").textContent = "SIN EVENTOS";
@@ -1340,8 +1318,6 @@ function rotate() {
     secondsLeft = ROTATION_SECONDS;
   }
 
-  document.getElementById("count1").textContent = secondsLeft;
-  document.getElementById("count2").textContent = secondsLeft;
 }
 
 updateClock();
