@@ -57,9 +57,12 @@ body { display:flex; }
 }
 
 #screenAgenda {
-  grid-template-columns:minmax(420px,43%) minmax(480px,1fr);
+  grid-template-columns:minmax(350px,37%) minmax(500px,1fr);
   grid-template-rows:auto minmax(0,1fr) 54px;
   gap:16px;
+  background:
+    radial-gradient(circle at 18% 48%,rgba(94,231,239,.13),transparent 32%),
+    radial-gradient(circle at 84% 35%,rgba(242,124,255,.12),transparent 32%);
 }
 
 .panel {
@@ -423,14 +426,15 @@ body { display:flex; }
   font-size:clamp(34px,4vw,50px);
   font-weight:900;
   text-shadow:0 0 16px rgba(242,124,255,.42);
+  letter-spacing:.025em;
 }
 
 .next-panel {
-  border-color:rgba(242,124,255,.42);
-  box-shadow:0 24px 55px rgba(0,0,0,.32), 0 0 32px rgba(242,124,255,.10);
+  border:2px solid rgba(94,231,239,.52);
+  box-shadow:0 24px 55px rgba(0,0,0,.38), 0 0 38px rgba(94,231,239,.12);
   background:
     linear-gradient(180deg,rgba(255,255,255,.06),transparent 22%),
-    linear-gradient(180deg,rgba(43,17,61,.82),rgba(13,12,24,.82));
+    linear-gradient(155deg,rgba(9,43,53,.94),rgba(7,14,25,.96));
   display:flex;
   flex-direction:column;
   gap:12px;
@@ -439,9 +443,9 @@ body { display:flex; }
 .next-label {
   display:inline-block;
   width:max-content;
-  background:rgba(242,124,255,.16);
-  border:1px solid rgba(242,124,255,.35);
-  color:#ffd6ff;
+  background:var(--cyan);
+  border:0;
+  color:#062126;
   border-radius:8px;
   padding:9px 14px;
   font-weight:900;
@@ -463,8 +467,9 @@ body { display:flex; }
   display:flex;
   flex-direction:column;
   justify-content:center;
-  border-color:rgba(94,231,239,.4);
-  background:linear-gradient(135deg,rgba(94,231,239,.16),rgba(59,130,246,.08));
+  border:2px solid rgba(94,231,239,.58);
+  background:linear-gradient(135deg,rgba(94,231,239,.22),rgba(59,130,246,.08));
+  box-shadow:inset 5px 0 0 var(--cyan);
 }
 
 .now-block.is-empty { opacity:.7; }
@@ -474,6 +479,9 @@ body { display:flex; }
   display:flex;
   flex-direction:column;
   justify-content:center;
+  border-color:rgba(255,209,102,.5);
+  background:linear-gradient(135deg,rgba(255,209,102,.14),rgba(242,124,255,.06));
+  box-shadow:inset 5px 0 0 var(--yellow);
 }
 
 .status-label {
@@ -481,13 +489,14 @@ body { display:flex; }
   font-size:clamp(16px,1.45vw,21px);
   font-weight:900;
   letter-spacing:.08em;
+  text-transform:uppercase;
 }
 
 .status-label.upcoming { color:var(--yellow); }
 
 .status-title {
   margin-top:8px;
-  font-size:clamp(27px,2.8vw,42px);
+  font-size:clamp(30px,3.15vw,47px);
   line-height:1.08;
   font-weight:900;
   overflow-wrap:anywhere;
@@ -555,7 +564,7 @@ body { display:flex; }
 }
 
 .list-panel {
-  border-color:rgba(242,124,255,.28);
+  border:2px solid rgba(242,124,255,.35);
   padding:0;
   overflow:hidden;
   display:grid;
@@ -563,12 +572,14 @@ body { display:flex; }
 }
 
 .list-title {
-  color:var(--pink);
-  text-align:center;
+  color:#fff;
+  text-align:left;
   font-size:clamp(22px,2.2vw,30px);
   font-weight:900;
-  padding:16px;
+  padding:14px 22px;
   border-bottom:1px solid rgba(242,124,255,.24);
+  background:linear-gradient(90deg,rgba(242,124,255,.23),transparent);
+  letter-spacing:.06em;
 }
 
 #eventList {
@@ -581,6 +592,7 @@ body { display:flex; }
 .event-list-scroll {
   transform:translate3d(0,0,0);
   will-change:transform;
+  padding:8px 14px 14px;
 }
 
 .event-list-scroll.is-overflowing-y {
@@ -597,8 +609,12 @@ body { display:flex; }
   grid-template-columns:112px minmax(0,1fr);
   align-items:center;
   gap:12px;
-  padding:13px 20px;
-  border-bottom:1px solid rgba(242,124,255,.18);
+  padding:13px 16px;
+  margin:0 0 7px;
+  border:1px solid rgba(255,255,255,.09);
+  border-left:5px solid var(--yellow);
+  border-radius:8px;
+  background:rgba(255,255,255,.045);
 }
 
 .event-row:last-child { border-bottom:none; }
@@ -638,10 +654,10 @@ body { display:flex; }
 }
 
 .event-day-heading {
-  padding:9px 20px 7px;
+  padding:14px 6px 9px;
   color:#ffd6ff;
-  background:rgba(242,124,255,.09);
-  border-bottom:1px solid rgba(242,124,255,.22);
+  background:transparent;
+  border-bottom:0;
   font-size:clamp(17px,1.65vw,23px);
   font-weight:900;
   letter-spacing:.06em;
@@ -653,6 +669,17 @@ body { display:flex; }
   font-size:clamp(25px,2.5vw,34px);
   font-weight:900;
   text-align:left;
+  font-variant-numeric:tabular-nums;
+}
+
+@media(min-width:900px) and (max-width:1100px) {
+  #screenAgenda.active {
+    display:grid;
+    grid-template-columns:minmax(330px,38%) minmax(0,1fr);
+    grid-template-rows:auto minmax(0,1fr) 54px;
+  }
+  #screenAgenda .panel { margin-bottom:0; }
+  #screenAgenda .footer { padding:0; }
 }
 
 .empty-state {
@@ -744,7 +771,7 @@ body { display:flex; }
 
   <article class="panel weather-panel">
     <div class="seahorse-box">
-      <canvas id="seahorse" class="seahorse-art" width="720" height="720" role="img" aria-label="Hipocampo del clima"></canvas>
+      <img class="seahorse-art" src="assets/hipocampo-transparente.png" alt="Hipocampo del clima">
     </div>
 
     <div class="weather-data">
@@ -822,7 +849,7 @@ body { display:flex; }
   </article>
 
   <article class="panel list-panel">
-    <div class="list-title">PRÓXIMOS EVENTOS</div>
+    <div class="list-title">DESPUÉS</div>
     <div id="eventList"></div>
   </article>
 
@@ -840,10 +867,6 @@ const REFRESH_MS = 60000;
 let secondsLeft = ROTATION_SECONDS;
 let showingAgenda = false;
 let locationRequestId = 0;
-let currentSeahorseColor = "#3b82f6";
-const seahorseImage = new Image();
-seahorseImage.src = "assets/hipocampo.png";
-seahorseImage.onload = () => paintSeahorse(currentSeahorseColor);
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -868,28 +891,6 @@ function escapeHtml(v) {
 function setScrollText(el, value) {
   if (!el) return;
   el.innerHTML = `<span>${escapeHtml(value || "--")}</span>`;
-}
-
-function paintSeahorse(color) {
-  currentSeahorseColor = color || currentSeahorseColor;
-  const canvas = document.getElementById("seahorse");
-  if (!canvas || !seahorseImage.complete || !seahorseImage.naturalWidth) return;
-
-  const ctx = canvas.getContext("2d");
-  const size = canvas.width;
-  ctx.clearRect(0, 0, size, size);
-
-  const scale = Math.min(size / seahorseImage.naturalWidth, size / seahorseImage.naturalHeight);
-  const w = seahorseImage.naturalWidth * scale;
-  const h = seahorseImage.naturalHeight * scale;
-  const x = (size - w) / 2;
-  const y = (size - h) / 2;
-
-  ctx.drawImage(seahorseImage, x, y, w, h);
-  ctx.globalCompositeOperation = "source-in";
-  ctx.fillStyle = currentSeahorseColor;
-  ctx.fillRect(0, 0, size, size);
-  ctx.globalCompositeOperation = "source-over";
 }
 
 function updateScrollingText() {
@@ -1137,7 +1138,6 @@ function applyData(data) {
   const weatherAccent = colorFor(desc, humN);
 
   document.querySelector(".weather-panel").style.setProperty("--weather-accent", weatherAccent);
-  paintSeahorse(weatherAccent);
   document.getElementById("conditionIcon").textContent = iconFor(desc);
   document.getElementById("weatherDesc").textContent = desc.replace(/^☁️\s*/, "");
   document.getElementById("weatherTemp").textContent = clean(weather.temp || "--");
@@ -1192,7 +1192,7 @@ function renderEvents(events) {
   document.getElementById("nextRelative").textContent = relativeUntil(next.start, "EN");
 
   let group = "";
-  const list = upcoming.map(e => {
+  const list = upcoming.slice(1).map(e => {
     const day = eventGroup(e.start);
     const heading = day !== group ? `<div class="event-day-heading">${escapeHtml(day)}</div>` : "";
     group = day;
