@@ -229,12 +229,11 @@ body { display:flex; }
 .update { margin-top:10px; }
 
 .weather-panel {
-  --weather-accent:#5ee7ef;
   display:grid;
   grid-template-columns:minmax(230px,34%) minmax(0,1fr);
   gap:18px;
   overflow:hidden;
-  border-color:color-mix(in srgb, var(--weather-accent), transparent 62%);
+  border-color:rgba(94,231,239,.38);
 }
 
 .seahorse-box {
@@ -244,7 +243,7 @@ body { display:flex; }
   align-items:center;
   justify-content:center;
   background:
-    radial-gradient(ellipse at 50% 42%, color-mix(in srgb, var(--weather-accent), transparent 72%), transparent 60%),
+    radial-gradient(ellipse at 50% 42%, rgba(94,231,239,.16), transparent 60%),
     linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
   border:1px solid rgba(255,255,255,.08);
   border-radius:8px;
@@ -270,7 +269,7 @@ body { display:flex; }
   animation:floaty 5s ease-in-out infinite;
   filter:
     drop-shadow(0 24px 28px rgba(0,0,0,.35))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--weather-accent), transparent 36%));
+    drop-shadow(0 0 24px rgba(94,231,239,.64));
 }
 
 @keyframes floaty {
@@ -908,7 +907,7 @@ body { display:flex; }
 
   <article class="panel weather-panel">
     <div class="seahorse-box">
-      <img class="seahorse-art" src="assets/hipocampo-transparente.png" alt="Hipocampo del clima">
+      <img id="seahorseArt" class="seahorse-art" src="assets/hipocampo-celeste.png" alt="Hipocampo del clima">
     </div>
 
     <div class="weather-data">
@@ -1118,18 +1117,17 @@ function iconFor(desc) {
   return "🌤️";
 }
 
-function colorFor(desc, humidity) {
+function seahorseFor(desc, humidity) {
   const d = clean(desc).toLowerCase();
-  if (d.includes("lluv") || d.includes("torment")) return "#ff4fa3";
+  if (d.includes("lluv") || d.includes("torment")) return "assets/hipocampo-rosa.png";
   if (
     humidity >= 78 ||
     d.includes("muy nub") ||
     d.includes("nublado") ||
     d.includes("niebla") ||
     d.includes("cubierto")
-  ) return "#a855f7";
-  if (humidity >= 65) return "#6d7cff";
-  return "#3b82f6";
+  ) return "assets/hipocampo-violeta.png";
+  return "assets/hipocampo-celeste.png";
 }
 
 function preferredLocation(weather) {
@@ -1266,9 +1264,7 @@ function applyData(data) {
   const hum = (details.match(/Humedad:\s*([^•]+)/i) || [null, "--"])[1].trim();
   const humN = num(hum);
   const wind = clean(weather.wind || "--").replace(/^Viento:\s*/i, "");
-  const weatherAccent = colorFor(desc, humN);
-
-  document.querySelector(".weather-panel").style.setProperty("--weather-accent", weatherAccent);
+  document.getElementById("seahorseArt").src = seahorseFor(desc, humN);
   document.getElementById("conditionIcon").textContent = iconFor(desc);
   document.getElementById("weatherDesc").textContent = desc.replace(/^☁️\s*/, "");
   document.getElementById("weatherTemp").textContent = clean(weather.temp || "--");
