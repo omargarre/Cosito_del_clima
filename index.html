@@ -294,7 +294,7 @@ body { display:flex; }
 
 .condition-box {
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(150px,32%);
+  grid-template-columns:minmax(0,1fr) minmax(190px,38%);
   border:1px solid rgba(157,229,236,.22);
   border-radius:8px;
   overflow:hidden;
@@ -319,7 +319,8 @@ body { display:flex; }
 
 .temp {
   color:var(--cyan);
-  font-size:clamp(42px,4.4vw,64px);
+  font-size:clamp(56px,5.8vw,84px);
+  line-height:1;
   border-left:1px solid rgba(157,229,236,.22);
   white-space:nowrap;
 }
@@ -823,16 +824,16 @@ body { display:flex; }
   .seahorse-art { width:auto; height:min(60vh,300px); max-width:112%; max-height:94%; }
   .weather-data { gap:6px; }
   .weather-title { font-size:23px; }
-  .condition-box { grid-template-columns:minmax(0,1fr) 150px; }
+  .condition-box { grid-template-columns:minmax(0,1fr) 190px; }
   .condition, .temp { gap:5px; padding:7px; font-size:20px; }
-  .temp { font-size:32px; }
+  .temp { font-size:66px; }
   .details { gap:5px; }
   .detail-value { margin-top:3px; font-size:16px; }
 
   .side { display:grid; grid-template-rows:1fr; gap:0; }
   .side .time { font-size:52px; line-height:1; }
   .side .date { margin-top:10px; font-size:15px; }
-  .temp { font-size:52px; }
+  .temp { font-size:66px; }
 
   .footer,
   #screenAgenda .footer {
