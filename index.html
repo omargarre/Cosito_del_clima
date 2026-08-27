@@ -799,6 +799,7 @@ body { display:flex; }
 .modal-actions,.alarm-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:5px; }
 .modal-actions button,.alarm-actions button { border:1px solid var(--line); border-radius:7px; padding:10px 15px; color:var(--ink); background:rgba(255,255,255,.08); font-weight:900; cursor:pointer; }
 .modal-actions .primary { color:#04191d; background:var(--cyan); border-color:var(--cyan); }
+.sound-test { border-color:var(--yellow)!important; color:var(--yellow)!important; }
 .event-finish { display:none; width:100%; margin-top:14px; border:1px solid var(--green); border-radius:7px; padding:11px 15px; color:#09200b; background:var(--green); font-weight:900; cursor:pointer; }
 .event-finish.visible { display:block; }
 .saved-events { margin-top:19px; border-top:1px solid var(--line); padding-top:14px; }
@@ -1092,7 +1093,7 @@ body { display:flex; }
       <label>FECHA Y HORA<input id="localEventStart" type="datetime-local" required></label>
       <label>DURACI&Oacute;N<select id="localEventDuration"><option value="30">30 minutos</option><option value="60" selected>1 hora</option><option value="90">1 hora y media</option><option value="120">2 horas</option></select></label>
       <label>ALARMA EN ESTA P&Aacute;GINA<select id="localEventAdvance"><option value="0">Al comenzar</option><option value="5" selected>5 minutos antes</option><option value="15">15 minutos antes</option><option value="30">30 minutos antes</option></select></label>
-      <div class="modal-actions"><button id="closeEventModal" type="button">CANCELAR</button><button class="primary" type="submit">ABRIR EN GOOGLE CALENDAR</button></div>
+      <div class="modal-actions"><button id="testAlarmSound" class="sound-test" type="button">PROBAR CHICHARRA</button><button id="closeEventModal" type="button">CANCELAR</button><button class="primary" type="submit">ABRIR EN GOOGLE CALENDAR</button></div>
     </form>
     <button id="finishEventModal" class="event-finish" type="button">FINALIZAR Y ACTUALIZAR</button>
     <div class="saved-events"><div class="saved-events-title">EVENTOS CARGADOS DESDE ESTA P&Aacute;GINA</div><div id="savedEventList"></div></div>
@@ -1535,16 +1536,23 @@ function renderSavedEvents() {
 }
 function unlockAudio() {
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx) return;
+  if (!AudioCtx) return Promise.resolve(false);
   if (!audioContext) audioContext = new AudioCtx();
-  if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+  if (audioContext.state === "running") return Promise.resolve(true);
+  return audioContext.resume().then(() => audioContext.state === "running").catch(() => false);
 }
 function buzzOnce() {
   if (!audioContext || audioContext.state !== "running") return;
-  const now=audioContext.currentTime, oscillator=audioContext.createOscillator(), gain=audioContext.createGain();
-  oscillator.type="square"; oscillator.frequency.setValueAtTime(520,now); oscillator.frequency.linearRampToValueAtTime(760,now+.28);
-  gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(.18,now+.02); gain.gain.setValueAtTime(.18,now+.3); gain.gain.exponentialRampToValueAtTime(.0001,now+.42);
-  oscillator.connect(gain).connect(audioContext.destination); oscillator.start(now); oscillator.stop(now+.44);
+  const now=audioContext.currentTime, gain=audioContext.createGain();
+  gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(.42,now+.02); gain.gain.setValueAtTime(.42,now+.34); gain.gain.exponentialRampToValueAtTime(.0001,now+.48);
+  gain.connect(audioContext.destination);
+  [540,690].forEach((frequency,index) => {
+    const oscillator=audioContext.createOscillator();
+    oscillator.type=index ? "sawtooth" : "square";
+    oscillator.frequency.setValueAtTime(frequency,now);
+    oscillator.frequency.linearRampToValueAtTime(frequency+190,now+.3);
+    oscillator.connect(gain); oscillator.start(now); oscillator.stop(now+.5);
+  });
 }
 function startAlarm(event) {
   if (activeAlarmEvent) return;
@@ -1553,7 +1561,8 @@ function startAlarm(event) {
   document.getElementById("alarmTitle").textContent=event.title || "Evento";
   document.getElementById("alarmTime").textContent=eventGroup(event.start)+" · "+eventHour(event.start);
   document.getElementById("alarmOverlay").classList.add("visible");
-  unlockAudio(); buzzOnce(); alarmTimer=setInterval(buzzOnce,900);
+  unlockAudio().then(enabled => { if(enabled && activeAlarmEvent===event) buzzOnce(); });
+  alarmTimer=setInterval(() => unlockAudio().then(enabled => { if(enabled) buzzOnce(); }),900);
 }
 function stopAlarm() {
   clearInterval(alarmTimer); alarmTimer=null; document.getElementById("alarmOverlay").classList.remove("visible"); activeAlarmEvent=null;
@@ -1578,6 +1587,14 @@ document.getElementById("openEventModal").addEventListener("click", () => {
   document.getElementById("eventModal").classList.add("visible"); document.getElementById("localEventTitle").focus(); unlockAudio();
 });
 document.getElementById("closeEventModal").addEventListener("click", () => document.getElementById("eventModal").classList.remove("visible"));
+document.getElementById("testAlarmSound").addEventListener("click", e => {
+  const button=e.currentTarget, original=button.textContent;
+  unlockAudio().then(enabled => {
+    if(!enabled){ button.textContent="AUDIO BLOQUEADO"; return; }
+    buzzOnce(); setTimeout(buzzOnce,600); setTimeout(buzzOnce,1200);
+    button.textContent="SONANDO..."; setTimeout(() => button.textContent=original,1900);
+  });
+});
 document.getElementById("finishEventModal").addEventListener("click", () => {
   document.getElementById("eventModal").classList.remove("visible");
   refreshData();
