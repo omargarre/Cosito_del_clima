@@ -649,6 +649,70 @@ body { display:flex; }
   background:rgba(255,255,255,.045);
 }
 
+/* Jerarquia visual de cursada: async < sync < parcial < final. */
+.event-row.event-async {
+  opacity:.58;
+  border-left-color:#718b98;
+  background:rgba(113,139,152,.055);
+}
+
+.event-row.event-async .event-name,
+.event-row.event-async .event-hour {
+  color:#a9bac3;
+  font-weight:700;
+}
+
+.event-row.event-sync {
+  border-left-color:var(--cyan);
+  background:linear-gradient(90deg,rgba(94,231,239,.12),rgba(255,255,255,.035));
+}
+
+.event-row.event-partial {
+  border-color:rgba(255,143,112,.42);
+  border-left-color:var(--coral);
+  background:linear-gradient(90deg,rgba(255,143,112,.25),rgba(255,209,102,.07));
+  box-shadow:0 0 18px rgba(255,143,112,.16);
+}
+
+.event-row.event-partial .event-name,
+.event-row.event-partial .event-hour { color:#ffd0a8; }
+
+.event-row.event-final {
+  border-color:rgba(242,124,255,.62);
+  border-left-color:var(--pink);
+  background:linear-gradient(90deg,rgba(242,124,255,.34),rgba(255,82,119,.13));
+  box-shadow:0 0 24px rgba(242,124,255,.26), inset 0 0 18px rgba(242,124,255,.07);
+}
+
+.event-row.event-final .event-name,
+.event-row.event-final .event-hour {
+  color:#fff0ff;
+  text-shadow:0 0 12px rgba(242,124,255,.5);
+}
+
+.next-block.event-async { opacity:.62; filter:saturate(.65); }
+.next-block.event-sync { border-color:rgba(94,231,239,.5); }
+.next-block.event-partial {
+  border-color:var(--coral);
+  background:linear-gradient(135deg,rgba(255,143,112,.25),rgba(255,209,102,.08));
+  box-shadow:0 0 26px rgba(255,143,112,.2);
+}
+.next-block.event-final {
+  border-color:var(--pink);
+  background:linear-gradient(135deg,rgba(242,124,255,.34),rgba(255,82,119,.12));
+  box-shadow:0 0 34px rgba(242,124,255,.32);
+}
+.next-block.event-partial .status-title { color:#ffd0a8; }
+.next-block.event-final .status-title {
+  color:#fff0ff;
+  text-shadow:0 0 16px rgba(242,124,255,.55);
+}
+
+.current-strip.event-async { opacity:.62; }
+.current-strip.event-sync { border-left-color:var(--cyan); }
+.current-strip.event-partial { border-left-color:var(--coral); background:rgba(255,143,112,.13); }
+.current-strip.event-final { border-left-color:var(--pink); background:rgba(242,124,255,.16); }
+
 .event-row:last-child { border-bottom:none; }
 
 .event-name {
@@ -722,6 +786,35 @@ body { display:flex; }
 }
 
 .error { color:#ff9b9b; }
+
+.event-add-button { position:fixed; right:18px; bottom:18px; z-index:40; border:1px solid rgba(94,231,239,.55); border-radius:8px; padding:11px 15px; color:var(--ink); background:rgba(8,30,40,.94); box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 18px rgba(94,231,239,.16); font:800 14px/1 Inter,"Segoe UI",sans-serif; cursor:pointer; }
+.event-add-button:hover { border-color:var(--cyan); background:#0d3340; }
+.modal-backdrop,.alarm-overlay { position:fixed; inset:0; z-index:100; display:none; place-items:center; padding:18px; background:rgba(2,7,12,.82); backdrop-filter:blur(8px); }
+.modal-backdrop.visible,.alarm-overlay.visible { display:grid; }
+.event-modal { width:min(92vw,520px); max-height:92vh; overflow:auto; border:1px solid rgba(94,231,239,.48); border-radius:10px; padding:22px; background:linear-gradient(155deg,#0b2630,#110f24); box-shadow:0 30px 80px rgba(0,0,0,.6); }
+.event-modal h2 { margin:0 0 18px; font-size:24px; }
+.event-form { display:grid; gap:13px; }
+.event-form label { display:grid; gap:6px; color:var(--muted); font-size:13px; font-weight:800; }
+.event-form input,.event-form select { width:100%; border:1px solid var(--line); border-radius:7px; padding:11px 12px; color:var(--ink); background:rgba(0,0,0,.28); font:600 16px/1.2 Inter,"Segoe UI",sans-serif; color-scheme:dark; }
+.modal-actions,.alarm-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:5px; }
+.modal-actions button,.alarm-actions button { border:1px solid var(--line); border-radius:7px; padding:10px 15px; color:var(--ink); background:rgba(255,255,255,.08); font-weight:900; cursor:pointer; }
+.modal-actions .primary { color:#04191d; background:var(--cyan); border-color:var(--cyan); }
+.event-finish { display:none; width:100%; margin-top:14px; border:1px solid var(--green); border-radius:7px; padding:11px 15px; color:#09200b; background:var(--green); font-weight:900; cursor:pointer; }
+.event-finish.visible { display:block; }
+.saved-events { margin-top:19px; border-top:1px solid var(--line); padding-top:14px; }
+.saved-events-title { color:var(--muted); font-size:12px; font-weight:900; letter-spacing:.06em; }
+.saved-event { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,.07); }
+.saved-event-text { min-width:0; flex:1; font-size:14px; }
+.saved-event-text b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.saved-event button { border:0; color:#ffb2b2; background:transparent; cursor:pointer; font-size:18px; }
+.alarm-card { width:min(92vw,650px); border:2px solid var(--coral); border-radius:14px; padding:30px; text-align:center; background:linear-gradient(145deg,#35151c,#151128); box-shadow:0 0 60px rgba(255,143,112,.45); animation:alarmPulse .75s ease-in-out infinite alternate; }
+.alarm-symbol { font-size:64px; }
+.alarm-kicker { color:var(--yellow); font-weight:900; letter-spacing:.12em; }
+.alarm-title { margin:10px 0; font-size:clamp(30px,5vw,54px); font-weight:950; overflow-wrap:anywhere; }
+.alarm-time { color:#ffd4c9; font-size:22px; font-weight:800; }
+.alarm-actions { justify-content:center; margin-top:24px; }
+.alarm-actions .dismiss { background:var(--coral); color:#24100c; border-color:var(--coral); }
+@keyframes alarmPulse { from { transform:scale(.985); } to { transform:scale(1); } }
 
 @media(max-width:1100px) {
   html,body { overflow:auto; }
@@ -990,6 +1083,29 @@ body { display:flex; }
   </footer>
 </section>
 
+<button id="openEventModal" class="event-add-button" type="button">+ AGREGAR EVENTO</button>
+<div id="eventModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+  <div class="event-modal">
+    <h2 id="eventModalTitle">Agregar evento</h2>
+    <form id="eventForm" class="event-form">
+      <label>T&Iacute;TULO<input id="localEventTitle" type="text" maxlength="100" required placeholder="Ej.: Llamar al m&eacute;dico"></label>
+      <label>FECHA Y HORA<input id="localEventStart" type="datetime-local" required></label>
+      <label>DURACI&Oacute;N<select id="localEventDuration"><option value="30">30 minutos</option><option value="60" selected>1 hora</option><option value="90">1 hora y media</option><option value="120">2 horas</option></select></label>
+      <label>ALARMA EN ESTA P&Aacute;GINA<select id="localEventAdvance"><option value="0">Al comenzar</option><option value="5" selected>5 minutos antes</option><option value="15">15 minutos antes</option><option value="30">30 minutos antes</option></select></label>
+      <div class="modal-actions"><button id="closeEventModal" type="button">CANCELAR</button><button class="primary" type="submit">GUARDAR</button></div>
+    </form>
+    <button id="finishEventModal" class="event-finish" type="button">FINALIZAR</button>
+    <div class="saved-events"><div class="saved-events-title">EVENTOS CARGADOS DESDE ESTA P&Aacute;GINA</div><div id="savedEventList"></div></div>
+  </div>
+</div>
+<div id="alarmOverlay" class="alarm-overlay" role="alertdialog" aria-modal="true" aria-labelledby="alarmTitle">
+  <div class="alarm-card">
+    <div class="alarm-symbol">&#128680;</div><div class="alarm-kicker">RECORDATORIO</div>
+    <div id="alarmTitle" class="alarm-title">Evento</div><div id="alarmTime" class="alarm-time"></div>
+    <div class="alarm-actions"><button id="snoozeAlarm" type="button">POSPONER 5 MIN</button><button id="dismissAlarm" class="dismiss" type="button">DESCARTAR</button></div>
+  </div>
+</div>
+
 <script>
 const DATA_URL = "https://script.google.com/macros/s/AKfycbwzUDamucrKQ_9X9TybqOEgmvHRHhbu306VEu_uHx2ZQe06Sppktyp3tsA9WMIUMiWK/exec";
 const ROTATION_SECONDS = 15;
@@ -998,6 +1114,11 @@ const REFRESH_MS = 60000;
 let secondsLeft = ROTATION_SECONDS;
 let showingAgenda = false;
 let locationRequestId = 0;
+let remoteEvents = [];
+let localEvents = loadLocalEvents();
+let activeAlarmEvent = null;
+let alarmTimer = null;
+let audioContext = null;
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -1018,6 +1139,15 @@ function escapeHtml(v) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
+function loadLocalEvents() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("cositoLocalEvents") || "[]");
+    return Array.isArray(saved) ? saved : [];
+  } catch (_) { return []; }
+}
+function saveLocalEvents() { localStorage.setItem("cositoLocalEvents", JSON.stringify(localEvents)); }
+function allEvents() { return remoteEvents.concat(localEvents.map(e => ({ ...e, local:true }))); }
 
 function setScrollText(el, value) {
   if (!el) return;
@@ -1240,10 +1370,28 @@ function relativeUntil(value, prefix) {
   return prefix + " " + hours + " H" + (rest ? " " + rest + " MIN" : "");
 }
 
+function eventVisualClass(title) {
+  const normalized = clean(title || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
+  if (/\bFINAL\b/.test(normalized)) return "event-final";
+  if (/\bPARCIAL\b/.test(normalized)) return "event-partial";
+  if (/\bASINC(?:RONICA|RONICO)?\b/.test(normalized)) return "event-async";
+  if (/\bCLASE\b/.test(normalized)) return "event-sync";
+  return "event-neutral";
+}
+
+function setEventVisualClass(element, title) {
+  if (!element) return;
+  element.classList.remove("event-neutral", "event-async", "event-sync", "event-partial", "event-final");
+  element.classList.add(eventVisualClass(title));
+}
+
 function applyData(data) {
   const tank = data.tank || {};
   const weather = data.weather || {};
-  const events = Array.isArray(data.events) ? data.events : [];
+  remoteEvents = Array.isArray(data.events) ? data.events : [];
 
   const percent = Number(tank.percent ?? 0);
   const free = Number(tank.free ?? (100 - percent));
@@ -1279,7 +1427,7 @@ function applyData(data) {
   document.getElementById("footerHumidity").textContent = hum;
   document.getElementById("footerWind").textContent = wind;
 
-  renderEvents(events);
+  renderEvents(allEvents());
   updateScrollingText();
 }
 
@@ -1294,14 +1442,17 @@ function renderEvents(events) {
   const currentStrip = document.getElementById("currentStrip");
   if (current) {
     currentStrip.classList.add("visible");
+    setEventVisualClass(currentStrip, current.title);
     document.getElementById("currentStripContent").textContent =
       clean(current.title || "Evento") + " · hasta " + eventHour(current.end);
   } else {
     currentStrip.classList.remove("visible");
+    setEventVisualClass(currentStrip, "");
     document.getElementById("currentStripContent").textContent = "";
   }
 
   if (!upcoming.length) {
+    setEventVisualClass(document.querySelector(".next-block"), "");
     document.getElementById("nextTitle").textContent = "SIN EVENTOS";
     document.getElementById("nextTime").textContent = "--";
     document.getElementById("nextRelative").textContent = "";
@@ -1312,6 +1463,7 @@ function renderEvents(events) {
   }
 
   const next = upcoming[0];
+  setEventVisualClass(document.querySelector(".next-block"), next.title);
   document.getElementById("nextTitle").textContent = clean(next.title || "Evento");
   document.getElementById("nextTime").textContent = eventGroup(next.start) + " · " + eventHour(next.start);
   document.getElementById("nextRelative").textContent = relativeUntil(next.start, "EN");
@@ -1322,7 +1474,7 @@ function renderEvents(events) {
     const heading = day !== group ? `<div class="event-day-heading">${escapeHtml(day)}</div>` : "";
     group = day;
     return `${heading}
-      <div class="event-row">
+      <div class="event-row ${eventVisualClass(e.title)}">
         <div class="event-hour">${eventHour(e.start)}</div>
         <div class="event-name">${escapeHtml(e.title || "Evento")}</div>
       </div>`;
@@ -1349,6 +1501,82 @@ function refreshData() {
   document.body.appendChild(script);
 }
 
+function defaultEventDate() {
+  const d = new Date(Date.now() + 3600000);
+  d.setMinutes(Math.ceil(d.getMinutes() / 5) * 5, 0, 0);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,16);
+}
+function renderSavedEvents() {
+  const future = localEvents.filter(e => new Date(e.end || e.start) > new Date()).sort((a,b) => new Date(a.start) - new Date(b.start));
+  document.getElementById("savedEventList").innerHTML = future.length ? future.map(e =>
+    `<div class="saved-event"><div class="saved-event-text"><b>${escapeHtml(e.title)}</b>${escapeHtml(eventGroup(e.start))} &middot; ${eventHour(e.start)}</div><button type="button" data-delete-event="${escapeHtml(e.id)}" aria-label="Eliminar">&times;</button></div>`
+  ).join("") : '<div class="saved-event-text" style="padding:12px 0">Todav&iacute;a no hay eventos propios.</div>';
+}
+function unlockAudio() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return;
+  if (!audioContext) audioContext = new AudioCtx();
+  if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+}
+function buzzOnce() {
+  if (!audioContext || audioContext.state !== "running") return;
+  const now=audioContext.currentTime, oscillator=audioContext.createOscillator(), gain=audioContext.createGain();
+  oscillator.type="square"; oscillator.frequency.setValueAtTime(520,now); oscillator.frequency.linearRampToValueAtTime(760,now+.28);
+  gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(.18,now+.02); gain.gain.setValueAtTime(.18,now+.3); gain.gain.exponentialRampToValueAtTime(.0001,now+.42);
+  oscillator.connect(gain).connect(audioContext.destination); oscillator.start(now); oscillator.stop(now+.44);
+}
+function startAlarm(event) {
+  if (activeAlarmEvent) return;
+  activeAlarmEvent=event; showingAgenda=true;
+  document.getElementById("screenMain").classList.remove("active"); document.getElementById("screenAgenda").classList.add("active");
+  document.getElementById("alarmTitle").textContent=event.title || "Evento";
+  document.getElementById("alarmTime").textContent=eventGroup(event.start)+" · "+eventHour(event.start);
+  document.getElementById("alarmOverlay").classList.add("visible");
+  unlockAudio(); buzzOnce(); alarmTimer=setInterval(buzzOnce,900);
+}
+function stopAlarm() {
+  clearInterval(alarmTimer); alarmTimer=null; document.getElementById("alarmOverlay").classList.remove("visible"); activeAlarmEvent=null;
+}
+function checkLocalAlarms() {
+  if (activeAlarmEvent) return;
+  const now=Date.now();
+  const event=localEvents.find(e => { const alarmAt=new Date(e.start).getTime()-Number(e.advance||0)*60000; return !e.alerted && now>=alarmAt && now<alarmAt+65000; });
+  if (!event) return;
+  event.alerted=true; saveLocalEvents(); startAlarm(event);
+}
+document.getElementById("openEventModal").addEventListener("click", () => {
+  document.getElementById("localEventStart").value=defaultEventDate(); renderSavedEvents();
+  document.getElementById("finishEventModal").classList.remove("visible");
+  document.getElementById("eventModal").classList.add("visible"); document.getElementById("localEventTitle").focus(); unlockAudio();
+});
+document.getElementById("closeEventModal").addEventListener("click", () => document.getElementById("eventModal").classList.remove("visible"));
+document.getElementById("finishEventModal").addEventListener("click", () => document.getElementById("eventModal").classList.remove("visible"));
+document.getElementById("eventModal").addEventListener("click", e => { if(e.target.id==="eventModal") e.currentTarget.classList.remove("visible"); });
+document.getElementById("eventForm").addEventListener("submit", e => {
+  e.preventDefault(); const start=new Date(document.getElementById("localEventStart").value);
+  if(isNaN(start)||start<=new Date()){ alert("Elegí una fecha y hora futuras."); return; }
+  const duration=Number(document.getElementById("localEventDuration").value);
+  let advance=Number(document.getElementById("localEventAdvance").value);
+  if(start.getTime()-advance*60000<=Date.now()) advance=0;
+  localEvents.push({id:"local-"+Date.now(),title:clean(document.getElementById("localEventTitle").value),start:start.toISOString(),end:new Date(start.getTime()+duration*60000).toISOString(),advance,alerted:false});
+  saveLocalEvents(); renderEvents(allEvents()); renderSavedEvents(); e.target.reset(); document.getElementById("localEventStart").value=defaultEventDate(); updateScrollingText();
+  document.getElementById("finishEventModal").classList.add("visible");
+});
+document.getElementById("savedEventList").addEventListener("click", e => {
+  const button=e.target.closest("[data-delete-event]"); if(!button) return;
+  localEvents=localEvents.filter(item => item.id!==button.dataset.deleteEvent); saveLocalEvents(); renderSavedEvents(); renderEvents(allEvents());
+});
+document.getElementById("dismissAlarm").addEventListener("click", stopAlarm);
+document.getElementById("snoozeAlarm").addEventListener("click", () => {
+  if(!activeAlarmEvent) return; const event=localEvents.find(e => e.id===activeAlarmEvent.id);
+  if(event){ event.start=new Date(Date.now()+5*60000).toISOString(); event.advance=0; event.alerted=false; saveLocalEvents(); renderEvents(allEvents()); }
+  stopAlarm();
+});
+document.addEventListener("pointerdown", unlockAudio, { once:true });
+document.addEventListener("keydown", e => {
+  if(e.key==="Escape" && !activeAlarmEvent) document.getElementById("eventModal").classList.remove("visible");
+});
+
 function rotate() {
   secondsLeft--;
   if (secondsLeft <= 0) {
@@ -1363,9 +1591,11 @@ function rotate() {
 }
 
 updateClock();
+renderEvents(allEvents());
 refreshData();
 
 setInterval(updateClock, 1000);
+setInterval(checkLocalAlarms, 1000);
 setInterval(rotate, 1000);
 setInterval(refreshData, REFRESH_MS);
 window.addEventListener("resize", updateScrollingText);
