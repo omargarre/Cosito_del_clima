@@ -1092,9 +1092,9 @@ body { display:flex; }
       <label>FECHA Y HORA<input id="localEventStart" type="datetime-local" required></label>
       <label>DURACI&Oacute;N<select id="localEventDuration"><option value="30">30 minutos</option><option value="60" selected>1 hora</option><option value="90">1 hora y media</option><option value="120">2 horas</option></select></label>
       <label>ALARMA EN ESTA P&Aacute;GINA<select id="localEventAdvance"><option value="0">Al comenzar</option><option value="5" selected>5 minutos antes</option><option value="15">15 minutos antes</option><option value="30">30 minutos antes</option></select></label>
-      <div class="modal-actions"><button id="closeEventModal" type="button">CANCELAR</button><button class="primary" type="submit">GUARDAR</button></div>
+      <div class="modal-actions"><button id="closeEventModal" type="button">CANCELAR</button><button class="primary" type="submit">ABRIR EN GOOGLE CALENDAR</button></div>
     </form>
-    <button id="finishEventModal" class="event-finish" type="button">FINALIZAR</button>
+    <button id="finishEventModal" class="event-finish" type="button">FINALIZAR Y ACTUALIZAR</button>
     <div class="saved-events"><div class="saved-events-title">EVENTOS CARGADOS DESDE ESTA P&Aacute;GINA</div><div id="savedEventList"></div></div>
   </div>
 </div>
@@ -1119,6 +1119,7 @@ let localEvents = loadLocalEvents();
 let activeAlarmEvent = null;
 let alarmTimer = null;
 let audioContext = null;
+let snoozedAlarms = [];
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -1148,6 +1149,26 @@ function loadLocalEvents() {
 }
 function saveLocalEvents() { localStorage.setItem("cositoLocalEvents", JSON.stringify(localEvents)); }
 function allEvents() { return remoteEvents.concat(localEvents.map(e => ({ ...e, local:true }))); }
+
+function eventAlertAdvance(event) {
+  if(event.local) return Number(event.advance || 0);
+  const marker=clean(event.description || "").match(/\[COSITO_ALERT:(\d+)\]/i);
+  return marker ? Number(marker[1]) : null;
+}
+
+function eventAlarmKey(event) {
+  return [event.title || "Evento", event.start, eventAlertAdvance(event)].join("|");
+}
+
+function wasAlerted(event) {
+  try { return localStorage.getItem("cositoAlerted:" + eventAlarmKey(event)) === "1"; }
+  catch (_) { return false; }
+}
+
+function markAlerted(event) {
+  try { localStorage.setItem("cositoAlerted:" + eventAlarmKey(event), "1"); }
+  catch (_) {}
+}
 
 function setScrollText(el, value) {
   if (!el) return;
@@ -1540,9 +1561,16 @@ function stopAlarm() {
 function checkLocalAlarms() {
   if (activeAlarmEvent) return;
   const now=Date.now();
-  const event=localEvents.find(e => { const alarmAt=new Date(e.start).getTime()-Number(e.advance||0)*60000; return !e.alerted && now>=alarmAt && now<alarmAt+65000; });
+  const snoozedIndex=snoozedAlarms.findIndex(e => now>=e.snoozeAt);
+  if(snoozedIndex>=0){ startAlarm(snoozedAlarms.splice(snoozedIndex,1)[0]); return; }
+  const event=allEvents().find(e => {
+    const advance=eventAlertAdvance(e);
+    if(advance===null) return false;
+    const alarmAt=new Date(e.start).getTime()-advance*60000;
+    return !wasAlerted(e) && !e.alerted && now>=alarmAt && now<alarmAt+65000;
+  });
   if (!event) return;
-  event.alerted=true; saveLocalEvents(); startAlarm(event);
+  event.alerted=true; markAlerted(event); if(event.local) saveLocalEvents(); startAlarm(event);
 }
 document.getElementById("openEventModal").addEventListener("click", () => {
   document.getElementById("localEventStart").value=defaultEventDate(); renderSavedEvents();
@@ -1550,7 +1578,11 @@ document.getElementById("openEventModal").addEventListener("click", () => {
   document.getElementById("eventModal").classList.add("visible"); document.getElementById("localEventTitle").focus(); unlockAudio();
 });
 document.getElementById("closeEventModal").addEventListener("click", () => document.getElementById("eventModal").classList.remove("visible"));
-document.getElementById("finishEventModal").addEventListener("click", () => document.getElementById("eventModal").classList.remove("visible"));
+document.getElementById("finishEventModal").addEventListener("click", () => {
+  document.getElementById("eventModal").classList.remove("visible");
+  refreshData();
+  setTimeout(refreshData,5000);
+});
 document.getElementById("eventModal").addEventListener("click", e => { if(e.target.id==="eventModal") e.currentTarget.classList.remove("visible"); });
 document.getElementById("eventForm").addEventListener("submit", e => {
   e.preventDefault(); const start=new Date(document.getElementById("localEventStart").value);
@@ -1558,8 +1590,16 @@ document.getElementById("eventForm").addEventListener("submit", e => {
   const duration=Number(document.getElementById("localEventDuration").value);
   let advance=Number(document.getElementById("localEventAdvance").value);
   if(start.getTime()-advance*60000<=Date.now()) advance=0;
-  localEvents.push({id:"local-"+Date.now(),title:clean(document.getElementById("localEventTitle").value),start:start.toISOString(),end:new Date(start.getTime()+duration*60000).toISOString(),advance,alerted:false});
-  saveLocalEvents(); renderEvents(allEvents()); renderSavedEvents(); e.target.reset(); document.getElementById("localEventStart").value=defaultEventDate(); updateScrollingText();
+  const title=clean(document.getElementById("localEventTitle").value);
+  const end=new Date(start.getTime()+duration*60000);
+  const calendarDate=d => d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}Z$/,"Z");
+  const params=new URLSearchParams({
+    action:"TEMPLATE",
+    text:title,
+    dates:calendarDate(start)+"/"+calendarDate(end),
+    details:"Creado desde Cosito del Clima\n[COSITO_ALERT:"+advance+"]"
+  });
+  window.open("https://calendar.google.com/calendar/render?"+params.toString(),"_blank","noopener");
   document.getElementById("finishEventModal").classList.add("visible");
 });
 document.getElementById("savedEventList").addEventListener("click", e => {
@@ -1570,6 +1610,7 @@ document.getElementById("dismissAlarm").addEventListener("click", stopAlarm);
 document.getElementById("snoozeAlarm").addEventListener("click", () => {
   if(!activeAlarmEvent) return; const event=localEvents.find(e => e.id===activeAlarmEvent.id);
   if(event){ event.start=new Date(Date.now()+5*60000).toISOString(); event.advance=0; event.alerted=false; saveLocalEvents(); renderEvents(allEvents()); }
+  else snoozedAlarms.push({...activeAlarmEvent,snoozeAt:Date.now()+5*60000});
   stopAlarm();
 });
 document.addEventListener("pointerdown", unlockAudio, { once:true });
