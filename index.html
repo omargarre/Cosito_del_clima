@@ -1632,6 +1632,11 @@ document.getElementById("snoozeAlarm").addEventListener("click", () => {
 });
 document.addEventListener("pointerdown", unlockAudio, { once:true });
 document.addEventListener("keydown", e => {
+  if(activeAlarmEvent){
+    e.preventDefault();
+    stopAlarm();
+    return;
+  }
   if(e.key==="Escape" && !activeAlarmEvent) document.getElementById("eventModal").classList.remove("visible");
 });
 
